@@ -1,0 +1,42 @@
+:root{
+  --bg:#0a0f1c;
+  --text:#e7ecf6;
+  --text-dim:#8fa0c0;
+  --green:#49dd8e;
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.5;
+}
+
+header.top{
+  padding:14px 24px;
+  border-bottom:1px solid #22314A;
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+.brand-title{font-family:var(--font-display); font-size:17px;}
+
+nav.tabs{display:flex; gap:4px; margin-left:auto;}
+.tab-btn{
+  background:transparent; border:1px solid transparent; color:var(--text-dim);
+  padding:8px 15px; border-radius:8px; font-size:14px; cursor:pointer;
+}
+.tab-btn.active{color:var(--bg); background:var(--text);}
+
+main{max-width:1180px; margin:0 auto; padding:32px 24px 80px;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+h1{font-family:var(--font-display); font-size:32px;}
+
+footer.site{border-top:1px solid #22314A; padding:26px 24px; text-align:center;}
+footer.site p{font-size:12px; color:var(--text-dim);}
