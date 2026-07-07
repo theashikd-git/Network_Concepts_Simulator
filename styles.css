@@ -155,3 +155,88 @@ p.lede{color:var(--text-dim); font-size:15.5px; max-width:680px; margin:0 0 28px
 }
 .glossary-item b{display:block; font-family:var(--font-mono); font-size:12.5px; color:var(--cyan); margin-bottom:4px;}
 .glossary-item span{font-size:12.5px; color:var(--text-dim);}
+
+/* ---------- Section headers (shared across tabs) ---------- */
+.section-head{margin-bottom:20px;}
+
+/* ---------- Shared two-column "stage" layout ----------
+   Both the ARP tab and (later) the OSI tab put a diagram on the left and a
+   step player + info card on the right, using this same grid. */
+.website-stage{display:grid; grid-template-columns:1fr; gap:16px; margin-top:18px; align-items:start;}
+@media (min-width:1000px){
+  .website-stage{grid-template-columns:minmax(560px, 1.35fr) 1fr;}
+}
+.journey-wrap{
+  background:var(--panel-2); border:1px solid var(--border-soft); border-radius:var(--radius);
+  padding:22px; overflow-x:auto; margin:0;
+}
+.website-main{display:flex; flex-direction:column; gap:14px; min-width:0;}
+
+/* ---------- Step player controls (shared) ---------- */
+.player-panel{
+  background:var(--panel); border:1px solid var(--border-soft); border-radius:var(--radius);
+  padding:20px 22px; display:flex; flex-direction:column;
+}
+.player-top{display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;}
+.step-count{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); margin-left:auto;}
+.layer-badge{
+  display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px;
+  padding:4px 9px; border-radius:6px; background:var(--panel-2); border:1px solid var(--border-soft); color:var(--text-dim);
+}
+.player-title{font-family:var(--font-display); font-size:17px; margin:0 0 6px;}
+.player-desc{font-size:14px; color:var(--text-dim); margin:0;}
+.player-detail{
+  margin-top:12px; padding-top:12px; border-top:1px solid var(--border-soft);
+  font-family:var(--font-mono); font-size:12px; color:var(--text-faint); display:flex; gap:16px; flex-wrap:wrap;
+}
+.player-detail b{color:var(--text-dim); font-weight:600;}
+.player-controls{display:flex; align-items:center; gap:8px; margin-top:16px;}
+
+.btn-icon{
+  width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:var(--panel-2);
+  color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px;
+  transition:all .15s ease;
+}
+.btn-icon:hover{border-color:var(--cyan); color:var(--cyan);}
+.btn-icon:disabled{opacity:.35; cursor:not-allowed;}
+.btn-icon.primary{background:var(--green); border-color:var(--green); color:#04231a;}
+.btn-icon.primary:hover{opacity:.85; color:#04231a;}
+
+.btn-ghost{
+  background:transparent; color:var(--text); border:1px solid var(--border); padding:9px 15px;
+  border-radius:8px; font-weight:500; font-size:13.5px; cursor:pointer; transition:all .15s ease;
+}
+.btn-ghost:hover{border-color:var(--text-dim); background:rgba(255,255,255,0.03);}
+
+.progress-dots{display:flex; gap:5px; flex:1; overflow-x:auto; padding:2px;}
+.progress-dots .pd{
+  width:8px; height:8px; border-radius:50%; background:var(--border); flex:none; cursor:pointer;
+  transition:all .2s ease; border:none; padding:0;
+}
+.progress-dots .pd.done{background:var(--green-dim);}
+.progress-dots .pd.current{background:var(--green); width:20px; border-radius:5px;}
+
+/* ---------- ARP-specific: target picker, diagram wrapper, cache table ---------- */
+.arp-bar{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px;}
+.arp-bar-label{font-size:13.5px; color:var(--text-dim);}
+.arp-targets{display:flex; gap:6px; flex-wrap:wrap;}
+.arp-target{
+  background:var(--panel-2); border:1px solid var(--border-soft); color:var(--text-dim);
+  font-family:var(--font-mono); font-size:11.5px; padding:6px 11px; border-radius:7px; cursor:pointer;
+  transition:all .15s ease; display:flex; flex-direction:column; align-items:flex-start; line-height:1.3;
+}
+.arp-target:hover{border-color:var(--cyan); color:var(--text);}
+.arp-target.selected{border-color:var(--green); background:var(--green-dim); color:var(--text);}
+.arp-target b{font-size:12px;}
+.arp-target span{font-size:9.5px; color:var(--text-faint);}
+
+.arp-diagram-wrap{display:flex; align-items:center; justify-content:center; padding:14px;}
+#arp-svg{width:100%; height:auto; max-height:440px; display:block;}
+
+.arp-cache table.cache-table{width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:12px;}
+table.cache-table th{text-align:left; color:var(--text-faint); font-weight:500; padding:6px 10px; border-bottom:1px solid var(--border-soft); text-transform:uppercase; font-size:10px; letter-spacing:0.5px;}
+table.cache-table td{padding:7px 10px; border-bottom:1px solid var(--border-soft); color:var(--text-dim);}
+table.cache-table tr.new td{color:var(--green);}
+.arp-legend{display:flex; gap:16px; flex-wrap:wrap; margin:12px 0 0; font-family:var(--font-mono); font-size:10.5px;}
+.arp-legend .lg-amber{color:var(--amber);}
+.arp-legend .lg-green{color:var(--green);}
