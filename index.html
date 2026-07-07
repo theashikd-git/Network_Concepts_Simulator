@@ -79,8 +79,58 @@
 
   <!-- ===================== ARP ===================== -->
   <section class="panel" id="panel-arp">
-    <h1>ARP Simulation</h1>
-    <p>Coming soon.</p>
+    <div class="section-head">
+      <p class="eyebrow">Address Resolution Protocol</p>
+      <h1 style="font-size:30px;">Who has this IP?</h1>
+      <p class="lede">Your PC wants to talk to another device but only knows its IP address not its physical MAC address. Watch ARP find it: your PC <b>shouts to everyone</b>, and only the right device answers.</p>
+    </div>
+
+    <div class="arp-bar">
+      <span class="arp-bar-label">Resolve the MAC address for:</span>
+      <div class="arp-targets" id="arp-targets"></div>
+      <button class="btn" id="arp-go">Start</button>
+    </div>
+
+    <div class="website-stage">
+      <div class="journey-wrap arp-diagram-wrap">
+        <svg id="arp-svg" viewBox="0 0 540 480" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Local network ARP diagram"></svg>
+      </div>
+
+      <div class="website-main">
+        <div class="player">
+          <div class="player-panel">
+            <div class="player-top">
+              <span class="layer-badge" id="arp-badge">—</span>
+              <span class="step-count" id="arp-count">step 1/1</span>
+            </div>
+            <div class="player-title" id="arp-title">—</div>
+            <p class="player-desc" id="arp-desc">Diagram and step logic are added in the next commits.</p>
+            <div class="player-detail" id="arp-detail"></div>
+            <div class="player-controls">
+              <button class="btn-icon" id="arp-prev" title="Previous">‹</button>
+              <button class="btn-icon primary" id="arp-play" title="Play">▶</button>
+              <button class="btn-icon" id="arp-next" title="Next">›</button>
+              <div class="progress-dots" id="arp-dots"></div>
+              <button class="btn-ghost" id="arp-replay">Replay</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card arp-cache">
+          <h3 style="margin-bottom:10px;">Your PC's ARP cache</h3>
+          <table class="cache-table">
+            <thead><tr><th>IP Address</th><th>MAC Address</th><th>Type</th></tr></thead>
+            <tbody id="arp-cache-body">
+              <tr><td colspan="3" style="color:var(--text-faint);">Empty resolve an address to fill it in</td></tr>
+            </tbody>
+          </table>
+          <p class="arp-legend">
+            <span class="lg lg-amber">● broadcast (to everyone)</span>
+            <span class="lg lg-green">● unicast reply (one device)</span>
+          </p>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ===================== OSI MODEL ===================== -->
