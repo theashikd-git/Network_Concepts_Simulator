@@ -240,3 +240,18 @@ table.cache-table tr.new td{color:var(--green);}
 .arp-legend{display:flex; gap:16px; flex-wrap:wrap; margin:12px 0 0; font-family:var(--font-mono); font-size:10.5px;}
 .arp-legend .lg-amber{color:var(--amber);}
 .arp-legend .lg-green{color:var(--green);}
+
+/* ---------- ARP diagram: base look (animation states added in a later commit) ---------- */
+.arp-node .node-box{fill:var(--panel); stroke:var(--border); stroke-width:1.5; transition:all .3s ease;}
+.arp-node .node-chip{fill:var(--bg-2); stroke:var(--border-soft); stroke-width:1;}
+.arp-node .node-namebg{fill:var(--panel); stroke:var(--border-soft); stroke-width:1;}
+.arp-node .node-label{fill:var(--text); font-family:var(--font-mono); font-size:11.5px; font-weight:600;}
+.arp-node .node-ip{fill:var(--cyan); font-family:var(--font-mono); font-size:11px; font-weight:600;}
+.arp-node .node-mac{fill:var(--text-faint); font-family:var(--font-mono); font-size:10px;}
+.arp-node .node-emoji{font-size:24px;}
+
+.arp-link{stroke:var(--border); stroke-width:2; transition:stroke .3s ease;}
+
+.arp-packet{opacity:0; transition:opacity .3s ease;} /* stays hidden until a later commit shows it */
+.arp-packet rect{rx:5;}
+.arp-packet text{font-family:var(--font-mono); font-weight:700; font-size:10px;}
