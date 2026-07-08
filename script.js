@@ -29,9 +29,6 @@
      The idea: your PC knows another device's IP address, but to actually send
      a frame on the local network it needs that device's MAC (hardware) address.
      ARP finds it by asking everyone and only the matching device replying.
-
-     This commit only draws the network picture using SVG (Scalable Vector
-     Graphics), which lets us place shapes and text at exact x/y coordinates.
   =========================================================================== */
   function initARP() {
     const SVG_NS = "http://www.w3.org/2000/svg";
