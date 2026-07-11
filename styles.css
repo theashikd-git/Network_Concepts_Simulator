@@ -255,3 +255,19 @@ table.cache-table tr.new td{color:var(--green);}
 .arp-packet{opacity:0; transition:opacity .3s ease;} /* stays hidden until a later commit shows it */
 .arp-packet rect{rx:5;}
 .arp-packet text{font-family:var(--font-mono); font-weight:700; font-size:10px;}
+
+/* ---------- ARP diagram: animated states (used by the step player) ---------- */
+.arp-node.asking .node-box{stroke:var(--cyan); stroke-width:2.5; filter:drop-shadow(0 0 6px rgba(79,195,247,0.5));}
+.arp-node.broadcast .node-box{stroke:var(--amber); stroke-width:2.5; filter:drop-shadow(0 0 6px rgba(245,185,77,0.45));}
+.arp-node.reject .node-box{stroke:var(--border); opacity:0.4;}
+.arp-node.reject .node-label, .arp-node.reject .node-ip, .arp-node.reject .node-emoji{opacity:0.4;}
+.arp-node.match .node-box{stroke:var(--green); stroke-width:2.5; fill:var(--green-dim); filter:drop-shadow(0 0 8px rgba(73,221,142,0.5));}
+
+.arp-link.live-amber{stroke:var(--amber); stroke-dasharray:5 4; animation:arpdash .5s linear infinite;}
+.arp-link.live-green{stroke:var(--green); stroke-width:2.5;}
+@keyframes arpdash{to{stroke-dashoffset:-18;}}
+
+.arp-reject-x{fill:none; stroke:var(--text-faint); stroke-width:2; opacity:0; transition:opacity .3s ease;}
+.arp-reject-x.show{opacity:0.7;}
+
+.arp-packet.show{opacity:1;}
