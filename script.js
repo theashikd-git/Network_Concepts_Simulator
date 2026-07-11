@@ -26,16 +26,7 @@
   /* ===========================================================================
      THE STEP PLAYER  (a reusable "slideshow" engine)
      -----------------------------------------------------------------------
-     Both the ARP demo and the OSI demo are really just a list of steps that
-     you can Play, Pause, go Next/Previous, or Replay. Rather than writing that
-     control logic twice, we write it ONCE here and reuse it.
 
-     You give createPlayer:
-       - steps:      an array of step objects (each has a title, desc, etc.)
-       - els:        the buttons and text areas it should control
-       - autoplayMs: how long to wait on each step when playing (milliseconds)
-       - onRender:   a function we call every time the step changes, so the
-                     specific demo can update its own picture/animation.
   =========================================================================== */
   function createPlayer(opts) {
     const { steps, els, autoplayMs = 2400, onRender } = opts;
@@ -345,6 +336,18 @@
       });
     }
 
+    // Smoothly scroll the diagram into view when the user presses Start,
+    // so they don't have to manually scroll down to see the animation.
+    function scrollToArp() {
+      const stage = $("#panel-arp .website-stage");
+      if (!stage) return;
+      const header = $("header.top");
+      const offset = (header ? header.offsetHeight : 0) + 14; // leave room for the sticky header
+      const y = stage.getBoundingClientRect().top + window.pageYOffset - offset;
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: Math.max(0, y), behavior: reduce ? "auto" : "smooth" });
+    }
+
     // Create (or re-create) the player with the current target's steps.
     function run(autoplay) {
       player = createPlayer({
@@ -353,7 +356,11 @@
         autoplayMs: 3000, // 3 seconds per step
         onRender: (s) => render(s),
       });
-      if (autoplay) player.play();
+      if (autoplay) {
+        scrollToArp();
+        // Start playing after the scroll finishes, so the packet lands in view.
+        setTimeout(() => { if (player) player.play(); }, 450);
+      }
     }
 
     build();
