@@ -50,7 +50,7 @@
       <div class="mod-card learn" id="learn-card">
         <div class="mod-top"><span class="mod-icon">📖</span><span class="mod-status info">● Reference</span></div>
         <h3>Learn Networking</h3>
-        <p>Quick definitions of the core building blocks — IP, MAC, routers, switches, gateways and more.</p>
+        <p>Quick definitions of the core building blocks IP, MAC, routers, switches, gateways and more.</p>
         <span class="mod-cta">See fundamentals ↓</span>
       </div>
     </div>
@@ -100,10 +100,10 @@
         <div class="player">
           <div class="player-panel">
             <div class="player-top">
-              <span class="layer-badge" id="arp-badge">—</span>
+              <span class="layer-badge" id="arp-badge"> </span>
               <span class="step-count" id="arp-count">step 1/1</span>
             </div>
-            <div class="player-title" id="arp-title">—</div>
+            <div class="player-title" id="arp-title"> </div>
             <p class="player-desc" id="arp-desc">Diagram and step logic are added in the next commits.</p>
             <div class="player-detail" id="arp-detail"></div>
             <div class="player-controls">
@@ -135,8 +135,83 @@
 
   <!-- ===================== OSI MODEL ===================== -->
   <section class="panel" id="panel-website">
-    <h1>OSI Model</h1>
-    <p>Coming soon.</p>
+    <div class="section-head">
+      <p class="eyebrow">The OSI model in action</p>
+      <h1 style="font-size:30px;">OSI Model</h1>
+      <p class="lede">Type a domain and press Simulate. Watch your data travel <b>down</b> the seven layers of your PC, across the network, then <b>up</b> the seven layers of the server one step every 3 seconds. Click any layer to read what it does.</p>
+    </div>
+
+    <div class="url-bar">
+      <div class="url-input-wrap">
+        <span>https://</span>
+        <input type="text" id="website-input" placeholder="example.com" value="example.com">
+      </div>
+      <button class="btn" id="website-go">Simulate</button>
+    </div>
+    <div class="quick-domains">
+      <button data-domain="google.com">google.com</button>
+      <button data-domain="youtube.com">youtube.com</button>
+      <button data-domain="github.com">github.com</button>
+      <button data-domain="wikipedia.org">wikipedia.org</button>
+    </div>
+
+    <div class="session-info" id="website-session"></div>
+
+    <div class="website-stage">
+      <div class="journey-wrap">
+        <div class="osi-journey" id="osi-journey">
+          <div class="tower" id="tower-client">
+            <div class="tower-cap">
+              <span class="tc-icon">💻</span>
+              <div class="tc-text"><b>Your PC</b><span id="tower-client-sub">sending</span></div>
+            </div>
+            <div class="tower-layers" id="tower-client-layers"></div>
+            <div class="tower-dir" id="tower-client-dir">▼ encapsulation</div>
+          </div>
+
+          <div class="journey-mid">
+            <div class="jm-arrow" id="jm-arrow">→</div>
+            <div class="jm-line"></div>
+            <div class="jm-label">physical medium</div>
+          </div>
+
+          <div class="tower" id="tower-server">
+            <div class="tower-cap">
+              <span class="tc-icon">🖥️</span>
+              <div class="tc-text"><b id="tower-server-name">the server</b><span id="tower-server-sub">receiving</span></div>
+            </div>
+            <div class="tower-layers" id="tower-server-layers"></div>
+            <div class="tower-dir" id="tower-server-dir">▲ decapsulation</div>
+          </div>
+
+          <div class="journey-packet" id="journey-packet"><span id="journey-packet-label">DATA</span></div>
+        </div>
+      </div>
+
+      <div class="website-main">
+        <div class="player">
+          <div class="player-panel">
+            <div class="player-top">
+              <span class="layer-badge" id="website-badge"></span>
+              <span class="step-count" id="website-count">step 1/1</span>
+            </div>
+            <div class="player-title" id="website-title"></div>
+            <p class="player-desc" id="website-desc">Layer data and animation are added in the next commits.</p>
+            <div class="player-detail" id="website-detail"></div>
+            <div class="player-controls">
+              <button class="btn-icon" id="website-prev" title="Previous">‹</button>
+              <button class="btn-icon primary" id="website-play" title="Play">▶</button>
+              <button class="btn-icon" id="website-next" title="Next">›</button>
+              <div class="progress-dots" id="website-dots"></div>
+              <button class="btn-ghost" id="website-replay">Replay</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card website-layer-detail" id="website-layer-detail"></div>
+      </div>
+    </div>
+    <p class="note">This is a teaching simulation, not a live packet capture IPs, MAC addresses, and timings are generated locally for illustration.</p>
   </section>
 
 </main>
