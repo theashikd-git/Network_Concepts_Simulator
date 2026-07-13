@@ -26,7 +26,16 @@
   /* ===========================================================================
      THE STEP PLAYER  (a reusable "slideshow" engine)
      -----------------------------------------------------------------------
+     Both the ARP demo and the OSI demo are really just a list of steps that
+     you can Play, Pause, go Next/Previous, or Replay. Rather than writing that
+     control logic twice, we write it ONCE here and reuse it.
 
+     You give createPlayer:
+       - steps:      an array of step objects (each has a title, desc, etc.)
+       - els:        the buttons and text areas it should control
+       - autoplayMs: how long to wait on each step when playing (milliseconds)
+       - onRender:   a function we call every time the step changes, so the
+                     specific demo can update its own picture/animation.
   =========================================================================== */
   function createPlayer(opts) {
     const { steps, els, autoplayMs = 2400, onRender } = opts;
@@ -372,6 +381,95 @@
   }
 
   /* ===========================================================================
+     OSI DEMO  (the "type a website" simulator)
+     -----------------------------------------------------------------------
+     The idea: when you visit a website, your data travels DOWN the 7 layers of
+     your PC (each layer wraps it in a header — "encapsulation"), across the
+     network, then UP the 7 layers of the server (each layer unwraps it —
+     "decapsulation"). This commit adds the layer facts and builds the two
+     towers of layer rows. The actual step-by-step simulation is wired up in
+     a later commit.
+  =========================================================================== */
+
+  // The 7 layers of the OSI model, each with a short beginner explanation.
+  const LAYERS = [
+    { n: 7, name: "Application", abbr: "HTTP / DNS / SMTP",
+      purpose: "The layer users and applications actually interact with where requests like \"load this webpage\" or \"send this email\" originate.",
+      header: "HTTP request line + headers (e.g. GET / HTTP/1.1)",
+      example: "A browser building an HTTP GET request for a page." },
+    { n: 6, name: "Presentation", abbr: "TLS / encoding",
+      purpose: "Formats and translates data between the application and the network character encoding, compression, and encryption.",
+      header: "Typically no separate header on the wire; folded into TLS/application data in practice.",
+      example: "Encrypting an HTTP request into HTTPS via TLS." },
+    { n: 5, name: "Session", abbr: "sessions / dialogs",
+      purpose: "Opens, manages, and closes the communication session between two devices, keeping dialogs in sync.",
+      header: "No distinct header in most modern web traffic handled implicitly by TCP connections and application logic.",
+      example: "Keeping a login session alive across multiple requests." },
+    { n: 4, name: "Transport", abbr: "TCP / UDP",
+      purpose: "Breaks data into segments, assigns port numbers, and (with TCP) guarantees ordered, reliable delivery.",
+      header: "TCP header source/destination port, sequence number, flags.",
+      example: "TCP port 443 identifying that this traffic is HTTPS." },
+    { n: 3, name: "Network", abbr: "IP / routing",
+      purpose: "Adds logical addressing and figures out the path which routers to cross to reach the destination network.",
+      header: "IP header source and destination IP address, TTL.",
+      example: "A router deciding the next hop based on the destination IP." },
+    { n: 2, name: "Data Link", abbr: "MAC / framing",
+      purpose: "Handles delivery across a single local link using physical (MAC) addresses, and detects transmission errors.",
+      header: "Ethernet header (source/destination MAC) + trailer (frame check sequence).",
+      example: "A switch forwarding a frame based on the destination MAC address." },
+    { n: 1, name: "Physical", abbr: "bits / signals",
+      purpose: "Converts frames into raw bits and transmits them as electrical, optical, or radio signals over real media.",
+      header: "No header just a stream of bits on the wire, fiber, or radio spectrum.",
+      example: "Voltage changes on an Ethernet cable representing 1s and 0s." },
+  ];
+
+  // A shorter version of the same layers, used to label the two towers.
+  const LAYER_META = {
+    7: { name: "Application",  abbr: "HTTP/DNS" },
+    6: { name: "Presentation", abbr: "TLS/encoding" },
+    5: { name: "Session",      abbr: "sessions" },
+    4: { name: "Transport",    abbr: "TCP/UDP" },
+    3: { name: "Network",      abbr: "IP/routing" },
+    2: { name: "Data Link",    abbr: "MAC/frames" },
+    1: { name: "Physical",     abbr: "bits" },
+  };
+
+  // Build both towers of 7 layer rows. onLayerClick runs when a row is clicked
+  // (for now it's just a placeholder — real behavior is added in a later commit).
+  function buildTowers(onLayerClick) {
+    ["client", "server"].forEach((side) => {
+      const host = $("#tower-" + side + "-layers");
+      host.innerHTML = "";
+      // We go from 7 down to 1 so Application is on top and Physical at the bottom.
+      for (let n = 7; n >= 1; n--) {
+        const meta = LAYER_META[n];
+        const row = document.createElement("div");
+        row.className = "tlayer";
+        row.dataset.n = n;
+        row.dataset.side = side;
+        row.setAttribute("role", "button");
+        row.setAttribute("tabindex", "0");
+        row.innerHTML = `<div class="tl-num">${n}</div><div class="tl-name">${meta.name}</div><div class="tl-abbr">${meta.abbr}</div>`;
+        row.addEventListener("click", () => onLayerClick(n));
+        row.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onLayerClick(n); }
+        });
+        host.appendChild(row);
+      }
+    });
+  }
+
+  // First-time setup for the OSI tab. The simulation logic (steps, animation,
+  // Simulate button) is wired up in later commits — for now this just fills
+  // the two towers so they're no longer empty.
+  function initWebsite() {
+    buildTowers((n) => {
+      // Placeholder: clicking a layer doesn't do anything meaningful yet.
+      console.log("Layer clicked:", n);
+    });
+  }
+
+  /* ===========================================================================
      TABS
   =========================================================================== */
   function activateTab(name) {
@@ -409,5 +507,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     initTabs();
     initARP();
+    initWebsite();
   });
 })();
