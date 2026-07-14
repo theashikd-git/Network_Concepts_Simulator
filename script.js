@@ -23,6 +23,40 @@
     return parts.join(":").toUpperCase();
   }
 
+  // Turn any text into a single number ("hash" it).
+  // We use this so the SAME domain always gives the SAME fake IP address,
+  // instead of a different one every time.
+  function hashStr(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+      h = (h * 31 + str.charCodeAt(i)) >>> 0; // >>> 0 keeps it a positive number
+    }
+    return h;
+  }
+
+  // Build a pretend public IP address for a website (e.g. "83.14.201.42").
+  // NOTE: this is NOT a real lookup — we just invent a believable-looking IP
+  // from the domain name so the demo has consistent numbers to show.
+  function fakePublicIP(domain) {
+    const h = hashStr(domain);
+    const a = 40 + (h % 180);
+    const b = (h >> 8) % 256;
+    const c = (h >> 16) % 256;
+    const d = 1 + ((h >> 24) % 253);
+    return [a, b, c, d].join(".");
+  }
+
+  // Tidy up whatever the user typed so it looks like a plain domain.
+  function cleanDomain(raw) {
+    let d = (raw || "").trim().toLowerCase();
+    d = d.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+    if (!d) d = "example.com";
+    if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)) {
+      d = d.replace(/[^a-z0-9.-]/g, "") || "example.com";
+    }
+    return d;
+  }
+
   /* ===========================================================================
      THE STEP PLAYER  (a reusable "slideshow" engine)
      -----------------------------------------------------------------------
@@ -457,6 +491,90 @@
         host.appendChild(row);
       }
     });
+  }
+
+  // A few values we keep for the whole simulation session.
+  const clientMac = randMac();      // our PC's MAC
+  const gatewayMac = randMac();     // the gateway's MAC
+  const clientIP = "192.168.1." + (2 + Math.floor(Math.random() * 250)); // our PC's IP
+
+  // Build the full list of steps for a given website.
+  // It's 15 steps: 7 going DOWN our PC, 1 crossing the network, 7 going UP the server.
+  // This function only RETURNS the data it isn't wired into the player yet
+  // (that happens in the next commit).
+  function buildWebsiteSteps(domain) {
+    const serverIP = fakePublicIP(domain);
+    const serverMac = randMac();
+    const steps = [];
+
+    // "pdu" is the label that will later be shown on the moving packet.
+    // Watch it GROW as headers are added on the way down, and SHRINK as
+    // they're removed on the way up.
+
+    // ---- SENDER: your PC, going DOWN (adding headers = encapsulation) ----
+    steps.push({ side: "client", layer: 7, title: "Application build the request",
+      desc: `You searched ${domain}. The application layer builds the HTTP request: GET / HTTP/1.1, Host: ${domain}. This is the raw data every layer below will wrap. (DNS, also here, has already resolved ${domain} to ${serverIP}.)`,
+      pdu: "DATA", details: { Protocol: "HTTP", Host: domain, "Resolved IP": serverIP } });
+
+    steps.push({ side: "client", layer: 6, title: "Presentation \u2192 encrypt & format",
+      desc: `The presentation layer encrypts the request with TLS (because it's HTTPS) and handles formatting/encoding, so the data is unreadable in transit.`,
+      pdu: "TLS\u00b7DATA", details: { Encryption: "TLS (simplified)" } });
+
+    steps.push({ side: "client", layer: 5, title: "Session \u2192 open the conversation",
+      desc: `The session layer starts and manages the dialog between your PC and ${domain}'s server, keeping this exchange organized as one session.`,
+      pdu: "TLS\u00b7DATA", details: { Session: "client \u21c4 server" } });
+
+    steps.push({ side: "client", layer: 4, title: "Transport \u2192 add TCP header",
+      desc: `The transport layer breaks data into segments and adds a TCP header with port 443 (HTTPS) and a sequence number, so delivery is reliable and ordered.`,
+      pdu: "TCP\u00b7DATA", details: { "Dst port": "443 (HTTPS)", Unit: "segment" } });
+
+    steps.push({ side: "client", layer: 3, title: "Network \u2192 add IP header",
+      desc: `The network layer adds an IP header with your IP (${clientIP}) as source and ${serverIP} as destination, forming a packet routers can forward.`,
+      pdu: "IP\u00b7TCP\u00b7DATA", details: { "Src IP": clientIP, "Dst IP": serverIP, Unit: "packet" } });
+
+    steps.push({ side: "client", layer: 2, title: "Data Link \u2192 add Ethernet frame",
+      desc: `The data link layer wraps the packet in a frame with MAC addresses (yours plus the gateway's, found via ARP) and an error-check trailer.`,
+      pdu: "ETH\u00b7IP\u00b7TCP\u00b7DATA", details: { "Src MAC": clientMac, "Dst MAC": gatewayMac, Unit: "frame" } });
+
+    steps.push({ side: "client", layer: 1, title: "Physical \u2192 send as bits",
+      desc: `The physical layer turns the frame into electrical, light, or radio signals and pushes the raw bits onto the wire or Wi-Fi.`,
+      pdu: "BITS", details: { Unit: "bits", Medium: "copper / fiber / radio" } });
+
+    // ---- ACROSS the network ----
+    steps.push({ side: "cross", layer: 1, title: "Across the network",
+      desc: `The bits travel across the local network to the switch, up through your router, hop-by-hop across the internet, and finally reach ${domain}'s server. Routers along the way only unwrap down to the IP header to decide the next hop.`,
+      pdu: "BITS", details: { Destination: serverIP } });
+
+    // ---- RECEIVER: the server, going UP (removing headers = decapsulation) ----
+    steps.push({ side: "server", layer: 1, title: "Physical \u2192 receive the bits",
+      desc: `The server's physical layer receives the raw signals and reconstructs them back into a frame of 1s and 0s.`,
+      pdu: "BITS", details: { Server: domain } });
+
+    steps.push({ side: "server", layer: 2, title: "Data Link \u2192 read & strip the frame",
+      desc: `The data link layer checks the frame reached the right MAC address, verifies the error-check trailer, then removes the Ethernet header.`,
+      pdu: "IP\u00b7TCP\u00b7DATA", details: { "Server MAC": serverMac } });
+
+    steps.push({ side: "server", layer: 3, title: "Network \u2192 read & strip the IP header",
+      desc: `The network layer confirms the packet's destination IP (${serverIP}) is this server, then removes the IP header.`,
+      pdu: "TCP\u00b7DATA", details: { "Dst IP": serverIP } });
+
+    steps.push({ side: "server", layer: 4, title: "Transport \u2192 reassemble segments",
+      desc: `The transport layer uses the TCP header to reassemble segments in order and hand them to the right application via port 443, then removes the TCP header.`,
+      pdu: "TLS\u00b7DATA", details: { Port: "443" } });
+
+    steps.push({ side: "server", layer: 5, title: "Session \u2192 match the session",
+      desc: `The session layer ties the data to the correct ongoing conversation with your PC.`,
+      pdu: "TLS\u00b7DATA", details: {} });
+
+    steps.push({ side: "server", layer: 6, title: "Presentation \u2192 decrypt",
+      desc: `The presentation layer decrypts the TLS-protected data back into a readable HTTP request.`,
+      pdu: "DATA", details: { Decryption: "TLS" } });
+
+    steps.push({ side: "server", layer: 7, title: "Application \u2192 server handles the request",
+      desc: `The application layer finally reads the original request, ${domain}'s web server finds the page, and prepares a response to send back down its own seven layers to you.`,
+      pdu: "DATA", details: { Result: "200 OK", Next: "response returns the same way" } });
+
+    return steps;
   }
 
   // First-time setup for the OSI tab. The simulation logic (steps, animation,
