@@ -160,8 +160,8 @@ p.lede{color:var(--text-dim); font-size:15.5px; max-width:680px; margin:0 0 28px
 .section-head{margin-bottom:20px;}
 
 /* ---------- Shared two-column "stage" layout ----------
-   Both the ARP tab and (later) the OSI tab put a diagram on the left and a
-   step player + info card on the right, using this same grid. */
+   The OSI Model tab puts a diagram on the left and a step player +
+   info card on the right, using this grid. */
 .website-stage{display:grid; grid-template-columns:1fr; gap:16px; margin-top:18px; align-items:start;}
 @media (min-width:1000px){
   .website-stage{grid-template-columns:minmax(560px, 1.35fr) 1fr;}
@@ -216,61 +216,6 @@ p.lede{color:var(--text-dim); font-size:15.5px; max-width:680px; margin:0 0 28px
 .progress-dots .pd.done{background:var(--green-dim);}
 .progress-dots .pd.current{background:var(--green); width:20px; border-radius:5px;}
 
-/* ---------- ARP-specific: target picker, diagram wrapper, cache table ---------- */
-.arp-bar{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px;}
-.arp-bar-label{font-size:13.5px; color:var(--text-dim);}
-.arp-targets{display:flex; gap:6px; flex-wrap:wrap;}
-.arp-target{
-  background:var(--panel-2); border:1px solid var(--border-soft); color:var(--text-dim);
-  font-family:var(--font-mono); font-size:11.5px; padding:6px 11px; border-radius:7px; cursor:pointer;
-  transition:all .15s ease; display:flex; flex-direction:column; align-items:flex-start; line-height:1.3;
-}
-.arp-target:hover{border-color:var(--cyan); color:var(--text);}
-.arp-target.selected{border-color:var(--green); background:var(--green-dim); color:var(--text);}
-.arp-target b{font-size:12px;}
-.arp-target span{font-size:9.5px; color:var(--text-faint);}
-
-.arp-diagram-wrap{display:flex; align-items:center; justify-content:center; padding:14px;}
-#arp-svg{width:100%; height:auto; max-height:440px; display:block;}
-
-.arp-cache table.cache-table{width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:12px;}
-table.cache-table th{text-align:left; color:var(--text-faint); font-weight:500; padding:6px 10px; border-bottom:1px solid var(--border-soft); text-transform:uppercase; font-size:10px; letter-spacing:0.5px;}
-table.cache-table td{padding:7px 10px; border-bottom:1px solid var(--border-soft); color:var(--text-dim);}
-table.cache-table tr.new td{color:var(--green);}
-.arp-legend{display:flex; gap:16px; flex-wrap:wrap; margin:12px 0 0; font-family:var(--font-mono); font-size:10.5px;}
-.arp-legend .lg-amber{color:var(--amber);}
-.arp-legend .lg-green{color:var(--green);}
-
-/* ---------- ARP diagram: base look (animation states added in a later commit) ---------- */
-.arp-node .node-box{fill:var(--panel); stroke:var(--border); stroke-width:1.5; transition:all .3s ease;}
-.arp-node .node-chip{fill:var(--bg-2); stroke:var(--border-soft); stroke-width:1;}
-.arp-node .node-namebg{fill:var(--panel); stroke:var(--border-soft); stroke-width:1;}
-.arp-node .node-label{fill:var(--text); font-family:var(--font-mono); font-size:11.5px; font-weight:600;}
-.arp-node .node-ip{fill:var(--cyan); font-family:var(--font-mono); font-size:11px; font-weight:600;}
-.arp-node .node-mac{fill:var(--text-faint); font-family:var(--font-mono); font-size:10px;}
-.arp-node .node-emoji{font-size:24px;}
-
-.arp-link{stroke:var(--border); stroke-width:2; transition:stroke .3s ease;}
-
-.arp-packet{opacity:0; transition:opacity .3s ease;} /* stays hidden until a later commit shows it */
-.arp-packet rect{rx:5;}
-.arp-packet text{font-family:var(--font-mono); font-weight:700; font-size:10px;}
-
-/* ---------- ARP diagram: animated states (used by the step player) ---------- */
-.arp-node.asking .node-box{stroke:var(--cyan); stroke-width:2.5; filter:drop-shadow(0 0 6px rgba(79,195,247,0.5));}
-.arp-node.broadcast .node-box{stroke:var(--amber); stroke-width:2.5; filter:drop-shadow(0 0 6px rgba(245,185,77,0.45));}
-.arp-node.reject .node-box{stroke:var(--border); opacity:0.4;}
-.arp-node.reject .node-label, .arp-node.reject .node-ip, .arp-node.reject .node-emoji{opacity:0.4;}
-.arp-node.match .node-box{stroke:var(--green); stroke-width:2.5; fill:var(--green-dim); filter:drop-shadow(0 0 8px rgba(73,221,142,0.5));}
-
-.arp-link.live-amber{stroke:var(--amber); stroke-dasharray:5 4; animation:arpdash .5s linear infinite;}
-.arp-link.live-green{stroke:var(--green); stroke-width:2.5;}
-@keyframes arpdash{to{stroke-dashoffset:-18;}}
-
-.arp-reject-x{fill:none; stroke:var(--text-faint); stroke-width:2; opacity:0; transition:opacity .3s ease;}
-.arp-reject-x.show{opacity:0.7;}
-
-.arp-packet.show{opacity:1;}
 
 /* ---------- OSI Model: URL input + quick domains ---------- */
 .url-bar{display:flex; gap:10px; margin-bottom:22px; align-items:center;}
@@ -326,6 +271,16 @@ table.cache-table tr.new td{color:var(--green);}
 .tlayer .tl-name{font-size:14px; font-weight:600; flex:1; line-height:1.1;}
 .tlayer .tl-abbr{font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); flex:none;}
 
+/* Highlight the layer the simulation is currently on */
+.tlayer.active{
+  border-color:var(--green); background:var(--green-dim);
+  box-shadow:0 0 0 3px rgba(73,221,142,0.12), 0 0 18px rgba(73,221,142,0.18);
+}
+.tlayer.active .tl-num{background:var(--green); color:#04231a;}
+.tlayer.active .tl-abbr{display:none;}
+/* Highlight a layer the user clicked to pin its details */
+.tlayer.pinned{border-color:var(--cyan); box-shadow:0 0 0 2px rgba(79,195,247,0.15);}
+
 .tower-dir{
   text-align:center; font-family:var(--font-mono); font-size:10.5px; letter-spacing:1px;
   text-transform:uppercase; color:var(--text-faint); margin-top:14px;
@@ -338,6 +293,8 @@ table.cache-table tr.new td{color:var(--green);}
   padding-top:120px; position:relative; height:100%;
 }
 .jm-arrow{font-size:26px; color:var(--text-faint); transition:color .3s ease, transform .3s ease;}
+.jm-arrow.active{color:var(--green); animation:jmpulse 1s ease infinite;}
+@keyframes jmpulse{0%,100%{transform:translateX(0);} 50%{transform:translateX(6px);}}
 .jm-line{width:2px; flex:1; margin:8px 0; background:repeating-linear-gradient(180deg,var(--border) 0 5px, transparent 5px 10px);}
 .jm-label{font-family:var(--font-mono); font-size:9px; color:var(--text-faint); text-transform:uppercase; letter-spacing:1px; writing-mode:vertical-rl; position:absolute; top:150px;}
 
@@ -358,3 +315,8 @@ table.cache-table tr.new td{color:var(--green);}
   letter-spacing:1px; color:var(--text-faint); margin-bottom:3px;
 }
 .website-layer-detail .field div{font-size:13.5px; color:var(--text);}
+
+/* Highlight the quick-domain button matching the currently loaded site */
+.quick-domains button.active{
+  border-color:var(--green); color:var(--green); background:var(--green-dim);
+}
