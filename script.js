@@ -60,9 +60,10 @@
   /* ===========================================================================
      THE STEP PLAYER  (a reusable "slideshow" engine)
      -----------------------------------------------------------------------
-     Both the ARP demo and the OSI demo are really just a list of steps that
-     you can Play, Pause, go Next/Previous, or Replay. Rather than writing that
-     control logic twice, we write it ONCE here and reuse it.
+     The OSI demo is really just a list of steps that you can Play, Pause,
+     go Next/Previous, or Replay. We keep that control logic in one place
+     here so it stays easy to follow and easy to reuse if more modules
+     are added later.
 
      You give createPlayer:
        - steps:      an array of step objects (each has a title, desc, etc.)
@@ -154,264 +155,6 @@
       goTo, play, stop, replay,
       refresh: () => { if (onRender) onRender(steps[idx], idx); },
     };
-  }
-
-  /* ===========================================================================
-     ARP DEMO  (Address Resolution Protocol)
-     -----------------------------------------------------------------------
-     The idea: your PC knows another device's IP address, but to actually send
-     a frame on the local network it needs that device's MAC (hardware) address.
-     ARP is how it finds out: it SHOUTS to everyone ("who has this IP?") and
-     only the matching device REPLIES. This commit wires that story into the
-     step player and animates the diagram to match.
-  =========================================================================== */
-  function initARP() {
-    const SVG_NS = "http://www.w3.org/2000/svg";
-    const svg = $("#arp-svg");
-    const cacheBody = $("#arp-cache-body");
-    const clientMac = randMac();
-
-    const PC = { id: "pc", x: 270, y: 130, emoji: "\uD83D\uDCBB", label: "Your PC", ip: "192.168.1.15", mac: clientMac };
-    const SWITCH = { x: 270, y: 265 };
-    const devices = [
-      { id: "printer", x: 120, y: 395, emoji: "\uD83D\uDDA8\uFE0F", label: "Printer", ip: "192.168.1.30", mac: randMac() },
-      { id: "gateway", x: 270, y: 395, emoji: "\uD83C\uDF10", label: "Gateway", ip: "192.168.1.1",  mac: randMac() },
-      { id: "pc2",     x: 420, y: 395, emoji: "\uD83D\uDDA5\uFE0F", label: "PC-2",    ip: "192.168.1.22", mac: randMac() },
-    ];
-    let target = devices[1];
-
-    function el(name, attrs) {
-      const e = document.createElementNS(SVG_NS, name);
-      for (const key in attrs) e.setAttribute(key, attrs[key]);
-      return e;
-    }
-
-    function nodeGroup(d) {
-      const g = el("g", { class: "arp-node", "data-id": d.id });
-
-      g.appendChild(el("rect", { class: "node-chip", x: d.x - 48, y: d.y - 72, width: 96, height: 34, rx: 7 }));
-      const ip = el("text", { class: "node-ip", x: d.x, y: d.y - 56, "text-anchor": "middle" });
-      ip.textContent = d.ip;
-      const mac = el("text", { class: "node-mac", x: d.x, y: d.y - 43, "text-anchor": "middle" });
-      mac.textContent = "MAC ?";
-      mac.dataset.mac = d.mac;
-
-      g.appendChild(el("rect", { class: "node-box", x: d.x - 34, y: d.y - 30, width: 68, height: 60, rx: 10 }));
-      const emo = el("text", { class: "node-emoji", x: d.x, y: d.y + 8, "text-anchor": "middle" });
-      emo.textContent = d.emoji;
-
-      g.appendChild(el("rect", { class: "node-namebg", x: d.x - 38, y: d.y + 38, width: 76, height: 20, rx: 6 }));
-      const lab = el("text", { class: "node-label", x: d.x, y: d.y + 52, "text-anchor": "middle" });
-      lab.textContent = d.label;
-
-      g.append(ip, mac, emo, lab);
-
-      // An "X" drawn over the box, hidden until this device rejects the request.
-      const rejectX = el("path", {
-        class: "arp-reject-x",
-        d: `M ${d.x - 12} ${d.y - 12} L ${d.x + 12} ${d.y + 12} M ${d.x + 12} ${d.y - 12} L ${d.x - 12} ${d.y + 12}`,
-      });
-      g.appendChild(rejectX);
-
-      return g;
-    }
-
-    function build() {
-      svg.innerHTML = "";
-
-      const sw = el("g", { class: "arp-node", "data-id": "switch" });
-      sw.appendChild(el("rect", { class: "node-box", x: SWITCH.x - 30, y: SWITCH.y - 22, width: 60, height: 44, rx: 9 }));
-      const se = el("text", { class: "node-emoji", x: SWITCH.x, y: SWITCH.y + 6, "text-anchor": "middle" });
-      se.textContent = "\uD83D\uDD00";
-      const sl = el("text", { class: "node-label", x: SWITCH.x, y: SWITCH.y + 34, "text-anchor": "middle" });
-      sl.textContent = "Switch";
-      sw.append(se, sl);
-
-      const links = [];
-      links.push(el("line", { class: "arp-link", "data-link": "pc", x1: PC.x, y1: PC.y + 62, x2: SWITCH.x, y2: SWITCH.y - 22 }));
-      devices.forEach((d) => {
-        links.push(el("line", { class: "arp-link", "data-link": d.id, x1: SWITCH.x, y1: SWITCH.y + 22, x2: d.x, y2: d.y - 30 }));
-      });
-
-      links.forEach((l) => svg.appendChild(l));
-      svg.appendChild(sw);
-      svg.appendChild(nodeGroup(PC));
-      devices.forEach((d) => svg.appendChild(nodeGroup(d)));
-
-      const pkt = el("g", { class: "arp-packet", id: "arp-packet" });
-      pkt.appendChild(el("rect", { x: -30, y: -11, width: 60, height: 22, rx: 5, fill: "var(--amber)" }));
-      const pt = el("text", { x: 0, y: 4, "text-anchor": "middle", fill: "#04121a" });
-      pt.textContent = "ARP";
-      pkt.appendChild(pt);
-      svg.appendChild(pkt);
-    }
-
-    // Put the diagram back to its neutral starting look (used before each step).
-    function reset() {
-      $all(".arp-node", svg).forEach((n) => n.classList.remove("asking", "broadcast", "reject", "match"));
-      $all(".arp-link", svg).forEach((l) => l.classList.remove("live-amber", "live-green"));
-      $all(".arp-reject-x", svg).forEach((x) => x.classList.remove("show"));
-      $all(".node-mac", svg).forEach((m) => (m.textContent = "MAC ?"));
-      const pkt = $("#arp-packet", svg);
-      if (pkt) pkt.classList.remove("show");
-      cacheBody.innerHTML = `<tr><td colspan="3" style="color:var(--text-faint);">Empty resolve an address to fill it in</td></tr>`;
-    }
-
-    function node(id) { return svg.querySelector(`.arp-node[data-id="${id}"]`); }
-    function link(id) { return svg.querySelector(`.arp-link[data-link="${id}"]`); }
-
-    function movePacket(x, y, color, text) {
-      const pkt = $("#arp-packet", svg);
-      if (!pkt) return;
-      pkt.querySelector("rect").setAttribute("fill", color);
-      pkt.querySelector("text").textContent = text;
-      pkt.setAttribute("transform", `translate(${x},${y})`);
-      pkt.classList.add("show");
-    }
-
-    // The 6 steps of the ARP story. Each step has a "stage" name that render()
-    // uses to decide what to light up on the diagram.
-    function steps() {
-      return [
-        { stage: "idle", badge: "ARP \u00b7 cache check",
-          title: "Your PC needs a MAC address",
-          desc: `Your PC wants to send data to ${target.label} at ${target.ip}, but a frame can only be delivered using a MAC (hardware) address. Your PC checks its ARP cache first \u2014 and it's empty. So it must ask the network.`,
-          details: { Have: target.ip, Need: `MAC of ${target.ip}` } },
-
-        { stage: "broadcast", badge: "ARP Request \u00b7 broadcast",
-          title: "ARP Request \u2014 shout to everyone",
-          desc: `Your PC sends an ARP Request as a broadcast: "Who has ${target.ip}? Tell 192.168.1.15." The switch floods it to every device on the network \u2014 that's what broadcast means.`,
-          details: { "Dst MAC": "FF:FF:FF:FF:FF:FF", Type: "broadcast" } },
-
-        { stage: "inspect", badge: "ARP Request \u00b7 received",
-          title: 'Every device checks: "is that me?"',
-          desc: `All three devices receive the same request and compare the asked-for IP (${target.ip}) against their own. Only one of them will match.`,
-          details: { Question: `is ${target.ip} mine?` } },
-
-        { stage: "match", badge: "ARP Request \u00b7 result",
-          title: "The wrong devices drop it \u2014 one matches",
-          desc: `The devices whose IP doesn't match simply discard the request. ${target.label} sees its own IP (${target.ip}) and gets ready to reply.`,
-          details: { Match: `${target.label} (${target.ip})` } },
-
-        { stage: "reply", badge: "ARP Reply \u00b7 unicast",
-          title: "ARP Reply \u2014 one answer, straight back",
-          desc: `${target.label} replies directly to your PC only (a unicast, not a broadcast): "${target.ip} is at ${target.mac}." Notice it travels back along a single path, not to everyone.`,
-          details: { From: target.label, MAC: target.mac } },
-
-        { stage: "done", badge: "ARP \u00b7 cache updated",
-          title: "Your PC saves it in the ARP cache",
-          desc: `Your PC stores the ${target.ip} \u2192 ${target.mac} mapping so it won't need to broadcast again for a while. Now it can finally build and send its frame.`,
-          details: { Cached: `${target.ip} \u2192 ${target.mac}` } },
-      ];
-    }
-
-    // Draw the diagram for whichever step we're on.
-    function render(s) {
-      reset();
-      const pc = node("pc");
-
-      if (s.stage === "idle") {
-        pc.classList.add("asking");
-
-      } else if (s.stage === "broadcast") {
-        // Light up ALL wires and ALL devices in amber = "sent to everyone".
-        pc.classList.add("asking");
-        link("pc").classList.add("live-amber");
-        devices.forEach((d) => {
-          link(d.id).classList.add("live-amber");
-          node(d.id).classList.add("broadcast");
-        });
-        movePacket(SWITCH.x, SWITCH.y, "var(--amber)", "ARP?");
-
-      } else if (s.stage === "inspect") {
-        devices.forEach((d) => node(d.id).classList.add("broadcast"));
-        movePacket(SWITCH.x, SWITCH.y, "var(--amber)", "ARP?");
-
-      } else if (s.stage === "match") {
-        // The matching device turns green; the others get an X.
-        devices.forEach((d) => {
-          if (d.id === target.id) {
-            node(d.id).classList.add("match");
-          } else {
-            node(d.id).classList.add("reject");
-            node(d.id).querySelector(".arp-reject-x").classList.add("show");
-          }
-        });
-
-      } else if (s.stage === "reply") {
-        // ONE green path back to our PC = a unicast reply (not a broadcast).
-        node(target.id).classList.add("match");
-        pc.classList.add("asking");
-        link(target.id).classList.add("live-green");
-        link("pc").classList.add("live-green");
-        node(target.id).querySelector(".node-mac").textContent = target.mac.slice(0, 8) + "\u2026";
-        movePacket((SWITCH.x + target.x) / 2, (SWITCH.y + target.y) / 2, "var(--green)", "MAC");
-
-      } else if (s.stage === "done") {
-        node(target.id).classList.add("match");
-        pc.classList.add("asking");
-        node(target.id).querySelector(".node-mac").textContent = target.mac.slice(0, 8) + "\u2026";
-        cacheBody.innerHTML = `<tr class="new"><td>${target.ip}</td><td>${target.mac}</td><td>dynamic</td></tr>`;
-      }
-    }
-
-    const els = {
-      title: $("#arp-title"), desc: $("#arp-desc"), badge: $("#arp-badge"),
-      count: $("#arp-count"), dots: $("#arp-dots"), prev: $("#arp-prev"),
-      next: $("#arp-next"), play: $("#arp-play"), replay: $("#arp-replay"),
-      detail: $("#arp-detail"),
-    };
-    let player = null;
-
-    function buildTargetButtons() {
-      const host = $("#arp-targets");
-      host.innerHTML = "";
-      devices.forEach((d) => {
-        const b = document.createElement("button");
-        b.className = "arp-target" + (d.id === target.id ? " selected" : "");
-        b.innerHTML = `<b>${d.label}</b><span>${d.ip}</span>`;
-        b.addEventListener("click", () => {
-          target = d;
-          $all(".arp-target", host).forEach((x) => x.classList.remove("selected"));
-          b.classList.add("selected");
-        });
-        host.appendChild(b);
-      });
-    }
-
-    // Smoothly scroll the diagram into view when the user presses Start,
-    // so they don't have to manually scroll down to see the animation.
-    function scrollToArp() {
-      const stage = $("#panel-arp .website-stage");
-      if (!stage) return;
-      const header = $("header.top");
-      const offset = (header ? header.offsetHeight : 0) + 14; // leave room for the sticky header
-      const y = stage.getBoundingClientRect().top + window.pageYOffset - offset;
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      window.scrollTo({ top: Math.max(0, y), behavior: reduce ? "auto" : "smooth" });
-    }
-
-    // Create (or re-create) the player with the current target's steps.
-    function run(autoplay) {
-      player = createPlayer({
-        steps: steps(),
-        els,
-        autoplayMs: 3000, // 3 seconds per step
-        onRender: (s) => render(s),
-      });
-      if (autoplay) {
-        scrollToArp();
-        // Start playing after the scroll finishes, so the packet lands in view.
-        setTimeout(() => { if (player) player.play(); }, 450);
-      }
-    }
-
-    build();
-    buildTargetButtons();
-    run(false); // build it but wait for the user to press Start
-
-    // Pressing Start rebuilds the diagram and plays from the beginning.
-    $("#arp-go").addEventListener("click", () => { build(); run(true); });
   }
 
   /* ===========================================================================
@@ -577,14 +320,169 @@
     return steps;
   }
 
-  // First-time setup for the OSI tab. The simulation logic (steps, animation,
-  // Simulate button) is wired up in later commits — for now this just fills
-  // the two towers so they're no longer empty.
-  function initWebsite() {
-    buildTowers((n) => {
-      // Placeholder: clicking a layer doesn't do anything meaningful yet.
-      console.log("Layer clicked:", n);
+  // For one step: highlight the active layer and move the packet to it.
+  function renderJourney(step) {
+    $all(".tlayer").forEach((r) => r.classList.remove("active"));
+
+    const arrow = $("#jm-arrow");
+    arrow.classList.toggle("active", step.side === "cross");
+
+    $("#tower-client-sub").textContent =
+      step.side === "client" ? "sending \u25bc" : step.side === "cross" ? "sent" : "waiting";
+    $("#tower-server-sub").textContent =
+      step.side === "server" ? "receiving \u25b2" : "waiting";
+
+    const packet = $("#journey-packet");
+    $("#journey-packet-label").textContent = step.pdu;
+
+    let targetRow = null;
+    if (step.side === "client") {
+      targetRow = document.querySelector(`.tlayer[data-side="client"][data-n="${step.layer}"]`);
+    } else if (step.side === "server") {
+      targetRow = document.querySelector(`.tlayer[data-side="server"][data-n="${step.layer}"]`);
+    }
+    if (targetRow) targetRow.classList.add("active");
+
+    const journey = $("#osi-journey");
+    requestAnimationFrame(() => {
+      const jr = journey.getBoundingClientRect();
+
+      if (step.side === "cross") {
+        const mid = $(".journey-mid").getBoundingClientRect();
+        packet.style.left = mid.left - jr.left + mid.width / 2 + "px";
+        packet.style.top = mid.top - jr.top + mid.height / 2 + "px";
+
+      } else if (targetRow) {
+        const tr = targetRow.getBoundingClientRect();
+        const stacked = window.matchMedia("(max-width:640px)").matches;
+        const edgeX = stacked
+          ? tr.left - jr.left + tr.width / 2
+          : step.side === "client" ? tr.right - jr.left : tr.left - jr.left;
+        packet.style.left = edgeX + "px";
+        packet.style.top = tr.top - jr.top + tr.height / 2 + "px";
+      }
+
+      packet.classList.add("show");
     });
+  }
+
+  // Fill in the little info line at the top (your IP/MAC, the server's IP).
+  function buildSession(domain) {
+    const serverIP = fakePublicIP(domain);
+    $("#tower-server-name").textContent = domain;
+    $("#website-session").innerHTML = `
+      <span><b>Your IP</b> ${clientIP}</span>
+      <span><b>Your MAC</b> ${clientMac}</span>
+      <span><b>Gateway MAC</b> ${gatewayMac}</span>
+      <span><b>${domain}</b> ${serverIP}</span>
+    `;
+  }
+
+  // The text shown in the detail box before the user clicks a specific layer.
+  const WEBSITE_OVERVIEW = `
+    <div class="field"><label>What you're looking at</label>
+      <div>Two seven-layer stacks: your PC on the left and the website's server on the right. Your request travels DOWN your layers (each one wraps it in a header), across the network, then UP the server's layers (each one unwraps it).</div></div>
+    <div class="field"><label>Tip</label><div>Press Simulate to play automatically (3s per step), step with \u2039 \u203a, or click any layer to read what it does.</div></div>
+  `;
+
+  // Show the details for one layer (or the overview text if n is null).
+  function renderWebsiteLayerDetail(n) {
+    const box = $("#website-layer-detail");
+    if (n == null) { box.innerHTML = WEBSITE_OVERVIEW; return; }
+
+    const layer = LAYERS.find((l) => l.n === n); // look up the facts for this layer
+    if (!layer) { box.innerHTML = WEBSITE_OVERVIEW; return; }
+
+    box.innerHTML = `
+      <div class="field"><label>Layer ${layer.n}</label><div>${layer.name} \u00b7 <span class="mono" style="color:var(--text-dim);">${layer.abbr}</span></div></div>
+      <div class="field"><label>Purpose</label><div>${layer.purpose}</div></div>
+      <div class="field"><label>Header added</label><div class="mono" style="font-size:12.5px;">${layer.header}</div></div>
+      <div class="field"><label>Real-world example</label><div>${layer.example}</div></div>
+    `;
+  }
+
+  // True once the user has clicked a layer — while pinned, the detail box
+  // stops auto-following the simulation so they can read in peace.
+  let websiteLayerPinned = false;
+
+  let websitePlayer = null;
+
+  // Create the player for the OSI simulation using the shared step-player engine.
+  function createWebsitePlayer(steps) {
+    const els = {
+      title: $("#website-title"), desc: $("#website-desc"), badge: $("#website-badge"),
+      count: $("#website-count"), dots: $("#website-dots"), prev: $("#website-prev"),
+      next: $("#website-next"), play: $("#website-play"), replay: $("#website-replay"),
+      detail: $("#website-detail"),
+    };
+    return createPlayer({
+      steps,
+      els,
+      autoplayMs: 3000,
+      onRender: (s) => {
+        els.badge.textContent =
+          s.side === "cross" ? "Across the network"
+          : s.side === "client" ? `Your PC \u00b7 Layer ${s.layer}`
+          : `Server \u00b7 Layer ${s.layer}`;
+        renderJourney(s);
+
+        // Auto-update the layer detail box to match the active layer,
+        // UNLESS the user has "pinned" a layer by clicking it.
+        if (!websiteLayerPinned && s.layer != null && s.side !== "cross") {
+          renderWebsiteLayerDetail(s.layer);
+        }
+      },
+    });
+  }
+
+  // Run the OSI simulation for whatever domain the user typed.
+  function runWebsiteSim(rawDomain, autoplay) {
+    const domain = cleanDomain(rawDomain);
+    $("#website-input").value = domain;
+    buildSession(domain);
+
+    // Highlight whichever quick-domain button matches what's loaded now.
+    $all(".quick-domains button").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.domain === domain);
+    });
+
+    // Start fresh: nothing pinned, show the overview text.
+    websiteLayerPinned = false;
+    $all(".tlayer").forEach((r) => r.classList.remove("pinned"));
+    renderWebsiteLayerDetail(null);
+
+    const steps = buildWebsiteSteps(domain);
+    websitePlayer = createWebsitePlayer(steps);
+
+    if (autoplay) websitePlayer.play();
+  }
+
+  // First-time setup for the OSI tab.
+  function initWebsite() {
+    // Build the two towers. Clicking a layer "pins" its details and pauses
+    // the simulation so the student can read without it auto-advancing.
+    buildTowers((n) => {
+      websiteLayerPinned = true;
+      if (websitePlayer) websitePlayer.stop();
+      $all(".tlayer").forEach((r) => r.classList.toggle("pinned", Number(r.dataset.n) === n));
+      renderWebsiteLayerDetail(n);
+    });
+
+    // Pressing "Simulate" runs the current text box value.
+    $("#website-go").addEventListener("click", () => runWebsiteSim($("#website-input").value, true));
+
+    // Pressing Enter in the text box does the same.
+    $("#website-input").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") runWebsiteSim($("#website-input").value, true);
+    });
+
+    // The quick-pick domain buttons.
+    $all(".quick-domains button").forEach((btn) => {
+      btn.addEventListener("click", () => runWebsiteSim(btn.dataset.domain, true));
+    });
+
+    // Load once (without auto-playing) so there's something to see at the start.
+    runWebsiteSim("example.com", false);
   }
 
   /* ===========================================================================
@@ -624,7 +522,6 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initTabs();
-    initARP();
     initWebsite();
   });
 })();
