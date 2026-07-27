@@ -7,11 +7,17 @@
 
 <body>
 
-<h1>Network Concepts Simulator</h1>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">Login</a>
+        <a href="#">Register</a>
+    </nav>
 
-<p>
-    Learning networking through interactive simulations.
-</p>
+    <h1>Network Concepts Simulator</h1>
+
+    <p>
+        Learning networking through interactive simulations.
+    </p>
 
 </body>
 </html>
