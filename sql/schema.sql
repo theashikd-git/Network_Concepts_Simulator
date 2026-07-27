@@ -9,3 +9,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE users
+ADD COLUMN role ENUM('student','admin') DEFAULT 'student',
+ADD COLUMN profile_image VARCHAR(255) DEFAULT NULL;
+
