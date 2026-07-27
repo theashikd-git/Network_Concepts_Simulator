@@ -1,85 +1,122 @@
-# Network Concepts Simulator
+# Network Concepts Simulator (Prototype)
 
-An interactive, browser-based tool for learning how networks actually move
-data, built with plain HTML, CSS, and JavaScript (no frameworks, no build
-step, no dependencies).
+This branch contains the **original prototype** of the Network Concepts Simulator.
 
-Instead of explaining networking concepts in isolated bullet points, this
-simulator animates them: type a website, and watch your request travel down
-the seven layers of your PC, across the network, and up the seven layers of
-the server, one step at a time.
+The purpose of this prototype was to validate the idea of teaching networking
+concepts through interactive, browser-based simulations using only HTML, CSS,
+and JavaScript.
 
----
-
-## Live modules
-
-| Module        | Status   | What it does |
-|---------------|----------|---------------|
-| **OSI Model** | ✅ Ready | Type any domain and press **Simulate**. Watch the request descend through Application → Presentation → Session → Transport → Network → Data Link → Physical on your PC (encapsulation), cross the network, then climb back up the same seven layers on the server (decapsulation). Click any layer at any time to pin its purpose, the header it adds, and a real-world example. |
-| **ARP**       | ✅ Ready | Pick a device to resolve, then watch your PC broadcast "who has this IP?" to every device on the local network. Only the matching device replies with its MAC address (a unicast), the wrong devices drop the request, and the resolved mapping is saved into your PC's ARP cache. |
-
-## Coming soon
-
-The dashboard also lists modules that are planned but not yet built:
-
-- **DNS** - Domain name resolution
-- **TCP** - Reliable connections & the three-way handshake
-- **UDP** - Fast, connectionless delivery
-- **DHCP** - Automatic IP assignment
-- **Routing** - How routers choose a path
-
-These appear as disabled cards on the Overview page so the roadmap is
-visible, but they aren't interactive yet.
+It serves as the foundation for the current project and is preserved as a
+historical reference. Active development continues in the **main** branch.
 
 ---
 
-## Project structure
+## Overview
+
+The prototype demonstrates how networking concepts can be visualized rather
+than simply explained through text.
+
+Users can interact with simulations to understand how network communication
+works step by step.
+
+---
+
+## Implemented Modules
+
+| Module | Status | Description |
+|---------|--------|-------------|
+| **OSI Model** | ✅ Complete | Simulates packet encapsulation on the client, transmission across the network, and decapsulation on the server through all seven OSI layers. |
+| **ARP** | ✅ Complete | Demonstrates how Address Resolution Protocol resolves an IP address into a MAC address using broadcast requests and unicast replies. |
+
+---
+
+## Planned Modules
+
+The following networking topics were planned for future development but were
+not implemented in this prototype.
+
+- DNS (Domain Name System)
+- TCP Three-Way Handshake
+- UDP Communication
+- DHCP
+- Routing
+
+These modules are implemented or under development in the **main** branch.
+
+---
+
+## Project Structure
 
 ```
 Network_Concepts_Simulator/
-├── index.html    # Markup: dashboard, nav, and the OSI Model + ARP panels
-├── styles.css    # All styling (design tokens, layout, animations)
-├── script.js     # All behavior (step player, OSI + ARP simulations, tab switching)
-└── README.md     # This file
+├── index.html
+├── styles.css
+├── script.js
+└── README.md
 ```
 
-The three files are meant to stay in the same folder, since `index.html` loads
-`styles.css` and `script.js` by relative path.
+### File Descriptions
 
-## Running it
+| File | Purpose |
+|------|---------|
+| **index.html** | Contains the application layout, navigation, dashboard, OSI Model panel, and ARP simulation interface. |
+| **styles.css** | Defines the application's layout, colors, animations, responsive design, and visual styling. |
+| **script.js** | Implements the simulation logic, animations, reusable step player, OSI Model simulation, ARP simulation, and navigation between sections. |
+| **README.md** | Documentation for the prototype project. |
 
-No installation, no build tools, no server required.
+---
 
-1. Download or clone the folder.
-2. Open `index.html` directly in any modern browser (Chrome, Firefox, Edge, Safari).
+## Technologies
 
-## How the code is organized
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- SVG
 
-`script.js` is structured in clearly commented sections:
+No frameworks, build tools, or external libraries are required.
 
-1. **Tiny helpers** - random MAC/IP generation, domain cleanup
-2. **The step player** - a small reusable "slideshow" engine (`createPlayer`) that drives play/pause/next/previous/replay for any list of steps
-3. **OSI layer facts** - the data behind each of the 7 layers (purpose, header, example)
-4. **OSI simulation** - builds the two layer "towers," generates the 15-step journey for a given domain, and animates the packet between them
-5. **ARP simulation** - builds the local-network diagram, broadcasts the request to every device, and animates the matching reply and cache update
-6. **Tabs** - switches between the Overview dashboard, the OSI Model panel, and the ARP panel
+---
 
-## Important note on the data
+## Running the Prototype
 
-This is a **teaching simulation, not a live packet capture**. IP addresses,
-MAC addresses, and timings are generated locally in the browser for
-illustration, so a real DNS lookup or ARP broadcast never happens. The
-*process* shown (encapsulation, decapsulation, the order of the OSI layers)
-is accurate; the specific numbers on screen are not real network traffic.
-Real-world HTTPS traffic also includes a TLS handshake, which is simplified
-here to a single step.
+1. Clone or download the repository.
+2. Switch to the **prototype** branch.
+3. Open `index.html` in any modern web browser.
 
-## Browser support
+No installation or server is required.
 
-Works in any modern evergreen browser. Uses standard SVG, CSS Grid, and
-vanilla JavaScript, with no polyfills included, so very old browsers (IE11,
-etc.) are not supported.
+---
+
+## Educational Purpose
+
+This prototype was created to demonstrate networking concepts visually,
+allowing students to observe how protocols operate internally instead of
+memorizing theoretical definitions.
+
+It focuses on:
+
+- OSI Model
+- Packet encapsulation
+- Packet decapsulation
+- ARP request and reply
+- MAC address resolution
+
+---
+
+## Project Evolution
+
+This prototype represents the first working implementation of the Network
+Concepts Simulator.
+
+The project has since evolved into a larger, modular application with additional
+features and an improved architecture.
+
+The latest development is available in the **main** branch.
+
+---
 
 ## License
 
-Educational project, free to use, modify, and extend for learning purposes.
+Educational project.
+
+Free to use, modify, and extend for learning purposes.
