@@ -1,3 +1,18 @@
+<?php
+
+require '../includes/db.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $fullname = $_POST['fullname'];
+    $email    = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Your database insert code will go here
+}
+
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -7,31 +22,38 @@
 
 <body>
 
-<h2>Create Account</h2>
+    <h2>Create Account</h2>
 
-<form method="POST">
+    <form method="POST">
 
-<input type="text"
-name="fullname"
-placeholder="Full Name">
+        <input
+            type="text"
+            name="fullname"
+            placeholder="Full Name"
+            required>
 
-<br><br>
+        <br><br>
 
-<input type="email"
-name="email"
-placeholder="Email">
+        <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            required>
 
-<br><br>
+        <br><br>
 
-<input type="password"
-name="password"
-placeholder="Password">
+        <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required>
 
-<br><br>
+        <br><br>
 
-<button>Create Account</button>
+        <button type="submit">Create Account</button>
 
-</form>
+    </form>
 
 </body>
+
 </html>
