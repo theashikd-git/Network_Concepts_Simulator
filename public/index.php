@@ -3,6 +3,8 @@
 <head>
     <title>Network Concepts Simulator</title>
     <link rel="stylesheet" href="assets/css/base.css">
+
+    require '../includes/auth.php';
 </head>
 
 <body>
