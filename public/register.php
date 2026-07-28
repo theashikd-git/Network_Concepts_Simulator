@@ -10,6 +10,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
 
     // Your database insert code will go here
+    $stmt=$conn->prepare(
+"INSERT INTO users(full_name,email,password)
+VALUES(?,?,?)");
 }
 
 ?>
