@@ -13,6 +13,11 @@
         <a href="#">Home</a>
         <a href="#">Login</a>
         <a href="#">Register</a>
+        Home
+
+        Login
+
+        Register
     </nav>
 
     <h1>Network Concepts Simulator</h1>
