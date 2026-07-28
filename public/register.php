@@ -3,6 +3,7 @@
 require '../includes/db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $password=password_hash($_POST['password'],PASSWORD_DEFAULT);
 
     $fullname = $_POST['fullname'];
     $email    = $_POST['email'];
