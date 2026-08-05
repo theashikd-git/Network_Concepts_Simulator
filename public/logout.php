@@ -1,7 +1,6 @@
 <?php
+require_once __DIR__ . '/../includes/auth.php';
 
-session_start();
-
-session_destroy();
-
-header("Location:index.php");
+logOut();
+header('Location: login.php');
+exit;
