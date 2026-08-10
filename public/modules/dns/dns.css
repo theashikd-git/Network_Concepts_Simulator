@@ -1,0 +1,30 @@
+/* DNS module: SVG resolver-hierarchy diagram + animation states,
+   fixed-height right column. Legend/cache-table are shared, in base.css. */
+.dns-diagram-wrap{display:flex; align-items:center; justify-content:center; padding:14px;}
+  #dns-svg{width:100%; height:auto; max-height:440px; display:block;}
+
+  /* SVG element states driven by JS classes (same approach as ARP) */
+  .dns-node .node-box{fill:var(--panel); stroke:var(--border); stroke-width:1.5; transition:all .3s ease;}
+  .dns-node .node-emoji{font-size:26px;}
+  .dns-node .node-label{fill:var(--text); font-family:var(--font-mono); font-size:11.5px; font-weight:600;}
+  .dns-node .node-sub{fill:var(--text-faint); font-family:var(--font-mono); font-size:9.5px;}
+
+  .dns-node.asking .node-box{stroke:var(--cyan); stroke-width:2.5; filter:drop-shadow(0 0 6px rgba(79,195,247,0.5));}
+  .dns-node.query  .node-box{stroke:var(--amber); stroke-width:2.5; filter:drop-shadow(0 0 6px rgba(245,185,77,0.45));}
+  .dns-node.answer .node-box{stroke:var(--green); stroke-width:2.5; fill:var(--green-dim); filter:drop-shadow(0 0 8px rgba(73,221,142,0.5));}
+
+  .dns-link{stroke:var(--border); stroke-width:2; transition:stroke .3s ease;}
+  .dns-link.live-cyan{stroke:var(--cyan); stroke-dasharray:5 4; animation:arpdash .5s linear infinite;}
+  .dns-link.live-green{stroke:var(--green); stroke-width:2.5;}
+
+  .dns-packet{opacity:0; transition:opacity .3s ease;}
+  .dns-packet.show{opacity:1;}
+  .dns-packet text{font-family:var(--font-mono); font-weight:700; font-size:10px;}
+
+  /* stable right-column heights for DNS (same idea as ARP) */
+  #panel-dns .website-main .player-panel{display:flex; flex-direction:column; height:320px;}
+  #panel-dns #dns-title{min-height:2.3em; display:flex; align-items:flex-start; flex:none;}
+  #panel-dns #dns-desc{flex:1 1 auto; min-height:60px; margin-top:2px; overflow:auto;}
+  #panel-dns #dns-detail{min-height:38px; flex:none;}
+  #panel-dns .player-controls{flex:none;}
+  .dns-cache{min-height:0;}
