@@ -1,0 +1,97 @@
+/* OSI module: the two seven-layer towers, moving packet, mobile stack,
+   fixed-height right column. Shared stage grid/.journey-wrap is in base.css. */
+.journey-wrap{
+    background:var(--panel-2); border:1px solid var(--border-soft); border-radius:var(--radius);
+    padding:22px; overflow-x:auto; margin:0;
+  }
+  .osi-journey{
+    position:relative; display:grid; grid-template-columns:1fr 110px 1fr; gap:0; align-items:start;
+    min-width:540px;
+  }
+  .tower{display:flex; flex-direction:column;}
+  .tower-cap{display:flex; align-items:center; gap:10px; padding:0 4px 14px;}
+  .tower-cap .tc-icon{font-size:24px;}
+  .tower-cap .tc-text{display:flex; flex-direction:column; line-height:1.2;}
+  .tower-cap .tc-text b{font-family:var(--font-display); font-size:15px;}
+  .tower-cap .tc-text span{font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint);}
+  #tower-server .tower-cap{flex-direction:row-reverse; text-align:right;}
+  #tower-server .tower-cap .tc-text{align-items:flex-end;}
+  .tower-layers{display:flex; flex-direction:column; gap:8px;}
+  .tlayer{
+    display:flex; align-items:center; gap:10px; padding:0 12px; border-radius:8px;
+    border:1px solid var(--border-soft); background:var(--panel); cursor:pointer;
+    transition:border-color .2s ease, background .2s ease, box-shadow .2s ease; position:relative; min-height:58px;
+  }
+  #tower-server .tlayer{flex-direction:row-reverse; text-align:right;}
+  .tlayer:hover{border-color:var(--text-faint);}
+  .tlayer .tl-num{
+    width:24px; height:24px; border-radius:6px; background:var(--panel-2); color:var(--text-dim);
+    font-family:var(--font-mono); font-size:12.5px; display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .tlayer .tl-name{font-size:14px; font-weight:600; flex:1; line-height:1.1;}
+  .tlayer .tl-abbr{font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); flex:none;}
+  .tlayer.active{
+    border-color:var(--green); background:var(--green-dim);
+    box-shadow:0 0 0 3px rgba(73,221,142,0.12), 0 0 18px rgba(73,221,142,0.18);
+  }
+  .tlayer.active .tl-num{background:var(--green); color:#04231a;}
+  .tlayer.active .tl-abbr{display:none;}
+  .tlayer.pinned{border-color:var(--cyan); box-shadow:0 0 0 2px rgba(79,195,247,0.15);}
+  .tower-dir{
+    text-align:center; font-family:var(--font-mono); font-size:10.5px; letter-spacing:1px;
+    text-transform:uppercase; color:var(--text-faint); margin-top:14px;
+  }
+  #tower-client-dir{color:var(--amber);}
+  #tower-server-dir{color:var(--cyan);}
+  .journey-mid{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding-top:120px; position:relative; height:100%;
+  }
+  .jm-arrow{font-size:26px; color:var(--text-faint); transition:color .3s ease, transform .3s ease;}
+  .jm-arrow.active{color:var(--green); animation:jmpulse 1s ease infinite;}
+  @keyframes jmpulse{0%,100%{transform:translateX(0);} 50%{transform:translateX(6px);}}
+  .jm-line{width:2px; flex:1; margin:8px 0; background:repeating-linear-gradient(180deg,var(--border) 0 5px, transparent 5px 10px);}
+  .jm-label{font-family:var(--font-mono); font-size:9px; color:var(--text-faint); text-transform:uppercase; letter-spacing:1px; writing-mode:vertical-rl; position:absolute; top:150px;}
+  .journey-packet{
+    position:absolute; z-index:5; padding:5px 11px; border-radius:6px;
+    background:var(--cyan); color:#04121a; font-family:var(--font-mono); font-size:11.5px; font-weight:700;
+    box-shadow:0 4px 14px rgba(79,195,247,0.4); white-space:nowrap;
+    transition:top .55s cubic-bezier(.4,0,.2,1), left .55s cubic-bezier(.4,0,.2,1);
+    opacity:0; pointer-events:none; transform:translate(-50%,-50%);
+  }
+  .journey-packet.show{opacity:1;}
+  /* --- Responsive: stack the two OSI towers vertically on narrow screens --- */
+  @media (max-width:640px){
+    .journey-wrap{overflow-x:visible;}
+    .osi-journey{grid-template-columns:1fr; min-width:0; gap:0;}
+    /* both towers read left-to-right consistently when stacked */
+    #tower-server .tower-cap{flex-direction:row; text-align:left;}
+    #tower-server .tower-cap .tc-text{align-items:flex-start;}
+    #tower-server .tlayer{flex-direction:row; text-align:left;}
+    .tower-dir{margin-top:8px; margin-bottom:2px;}
+    /* the middle becomes a slim horizontal "across the network" divider */
+    .journey-mid{flex-direction:row; padding-top:0; height:auto; gap:10px; margin:14px 0; justify-content:center;}
+    .jm-arrow{transform:rotate(90deg);}
+    .jm-arrow.active{animation:jmpulseV 1s ease infinite;}
+    .jm-line{width:auto; flex:1; height:2px; margin:0; max-width:120px;
+      background:repeating-linear-gradient(90deg,var(--border) 0 5px, transparent 5px 10px);}
+    .jm-label{writing-mode:horizontal-tb; position:static; top:auto; font-size:9px;}
+    .tlayer{min-height:50px;}
+  }
+  @keyframes jmpulseV{0%,100%{transform:rotate(90deg) translateX(0);} 50%{transform:rotate(90deg) translateX(5px);}}
+  .website-main .player-panel{
+    display:flex; flex-direction:column; height:344px;
+  }
+  #website-title{min-height:2.3em; display:flex; align-items:flex-start; flex:none;}
+  #website-desc{flex:1 1 auto; min-height:60px; margin-top:2px; overflow:auto;}
+  #website-detail{min-height:44px; align-content:flex-start; flex:none;}
+  .website-main .player-controls{flex:none;}
+  .website-layer-detail{height:264px; overflow:auto;}
+  .website-layer-detail .wld-empty{color:var(--text-faint); font-size:13px;}
+  .website-layer-detail .field{margin-bottom:11px;}
+  .website-layer-detail .field:last-child{margin-bottom:0;}
+  .website-layer-detail .field label{
+    display:block; font-family:var(--font-mono); font-size:10px; text-transform:uppercase;
+    letter-spacing:1px; color:var(--text-faint); margin-bottom:3px;
+  }
+  .website-layer-detail .field div{font-size:13.5px; color:var(--text);}
