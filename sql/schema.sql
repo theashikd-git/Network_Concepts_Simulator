@@ -1,5 +1,10 @@
 -- ============================================================
 -- Network Concepts Simulator — Database Schema
+-- Users
+--
+-- Run this once in phpMyAdmin (or via `mysql -u root -p < schema.sql`)
+-- to create the database and the users table. More tables will be
+-- added here as later phases (dashboard, quizzes, notes, etc.) are built.
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS network_simulator
